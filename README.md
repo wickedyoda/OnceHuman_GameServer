@@ -4,6 +4,8 @@ Dockerized Once Human dedicated server using SteamCMD.
 
 Created and maintained by WickedYoda.
 
+![Once Human Logo](assets/once-human-logo.webp)
+
 ## Quick Start
 
 ```bash
@@ -62,3 +64,7 @@ Connect via RCON or server console. Common commands:
 - Docker + Docker Compose
 - 4GB RAM minimum for 1–8 players
 - Ports forwarded on router if public
+
+## Legal
+
+See [TERMS.md](./TERMS.md) for terms of use, disclaimer, and limitation of liability.
