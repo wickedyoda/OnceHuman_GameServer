@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  oncehuman:
+    image: once-human:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: once-human
+    restart: unless-stopped
+    ports:
+      - "27015:27015/tcp"
+      - "27015:27015/udp"
+      - "27016:27016/tcp"
+      - "27016:27016/udp"
+      - "27017:27017/tcp"
+      - "27017:27017/udp"
+    environment:
+      - SERVER_NAME=My Once Human Server
+      - MAX_PLAYERS=16
+      - PVE_ENABLED=true
+      - DAY_LENGTH=60
+      - NIGHT_LENGTH=30
+      - XP_MULTIPLIER=1.0
+      - RESOURCE_MULTIPLIER=1.0
+      - DROP_MULTIPLIER=1.0
+      - SERVER_PASSWORD=${SERVER_PASSWORD:-}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-}
+    volumes:
+      - ./config:/home/oncehuman/server/OnceHuman/Saved/Config/LinuxServer
+      - ./saved:/home/oncehuman/server/OnceHuman/Saved
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
