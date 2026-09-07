@@ -80,7 +80,39 @@ If your server doesn’t appear in the browser:
 
 Once Human supports crossplay between PC, PS5, Xbox, and mobile. All clients connect the same way via IP or server browser. Players just need their own Once Human account/license and the server password if set.
 
-## 5. Manage the Server
+## 5. Character Transfer
+
+### Important Limitation
+
+Official Once Human servers and custom/community servers are **separate**. According to official announcements and Steam discussions:
+
+- Characters from official servers **do not appear** in custom servers.
+- Custom servers **do not support data migration** between scenarios.
+- Each character is **bound to the specific server** where it was created.
+- When a server is reset, characters retain nickname/appearance, but **all other progress is erased**.
+
+### What This Means for Your Self-Hosted Server
+
+Players joining your self-hosted server will need to **create new characters** there. Their official-server progress cannot be imported or transferred.
+
+### If Transfer Becomes Available
+
+If future updates add export/import functionality:
+
+1. Export the character on the source server.
+2. Stop the server here: `docker compose stop oncehuman`
+3. Place exported data into the mounted `saved/` directory on the host.
+4. Start the server: `docker compose up -d`
+5. Confirm the character appears.
+
+### Backup First
+
+Always back up `saved/` before importing any data:
+```bash
+cp -r saved saved-backup-$(date +%Y%m%d)
+```
+
+## 6. Manage the Server
 
 ### RCON
 Use any RCON client with:
