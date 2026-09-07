@@ -103,3 +103,7 @@ Forward these ports on your router to this host:
 - Reduce `MAX_PLAYERS`
 - Lower resource multipliers
 - Check CPU/RAM limits in `docker-compose.yml`
+
+## License
+
+This project is licensed under the GNU General Public License v3.0. See the repository [LICENSE](./LICENSE) file for details.
