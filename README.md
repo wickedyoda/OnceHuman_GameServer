@@ -67,9 +67,10 @@ Connect via RCON or server console. Common commands:
 
 ## Legal
 
-See [TERMS.md](./TERMS.md) for terms of use, disclaimer, and limitation of liability.
+This project is licensed under the GNU General Public License v3.0. See [LICENSE](./LICENSE) for full terms.
 
-## Documentation
+- Created and maintained by WickedYoda
+- [Terms, Disclaimer, and Limitation of Liability](./TERMS.md)
 
 - [Setup Guide](./HOWTO.md) — step-by-step installation and configuration
 - [Security Assessment](./SECURITY.md) — vulnerabilities and hardening recommendations
