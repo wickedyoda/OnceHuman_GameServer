@@ -2,6 +2,8 @@
 
 Dockerized Once Human dedicated server using SteamCMD.
 
+Created and maintained by WickedYoda.
+
 ## Quick Start
 
 ```bash
