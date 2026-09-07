@@ -16,19 +16,19 @@ services:
       - "27017:27017/tcp"
       - "27017:27017/udp"
     environment:
-      - SERVER_NAME=My Once Human Server
-      - MAX_PLAYERS=16
-      - PVE_ENABLED=true
-      - DAY_LENGTH=60
-      - NIGHT_LENGTH=30
-      - XP_MULTIPLIER=1.0
-      - RESOURCE_MULTIPLIER=1.0
-      - DROP_MULTIPLIER=1.0
+      - SERVER_NAME=${SERVER_NAME:-My Once Human Server}
+      - MAX_PLAYERS=${MAX_PLAYERS:-16}
+      - PVE_ENABLED=${PVE_ENABLED:-true}
+      - DAY_LENGTH=${DAY_LENGTH:-60}
+      - NIGHT_LENGTH=${NIGHT_LENGTH:-30}
+      - XP_MULTIPLIER=${XP_MULTIPLIER:-1.0}
+      - RESOURCE_MULTIPLIER=${RESOURCE_MULTIPLIER:-1.0}
+      - DROP_MULTIPLIER=${DROP_MULTIPLIER:-1.0}
       - SERVER_PASSWORD=${SERVER_PASSWORD:-}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD:-}
     volumes:
-      - ./config:/home/oncehuman/server/OnceHuman/Saved/Config/LinuxServer
-      - ./saved:/home/oncehuman/server/OnceHuman/Saved
+      - ./saves:/home/oncehuman/server/OnceHuman/Saved
+      - ./config/GameUserSettings.ini:/home/oncehuman/server/OnceHuman/Saved/Config/LinuxServer/GameUserSettings.ini:ro
     ulimits:
       nofile:
         soft: 65536
