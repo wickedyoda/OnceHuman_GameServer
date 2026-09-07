@@ -43,9 +43,42 @@ Server is ready
 
 ## 4. Connect
 
-- In-game: add server via IP `your-public-ip:27015`
-- Direct connect: `your-public-ip:27015`
-- Enter server password if set
+### Find Your Server IP
+
+On the server host:
+```bash
+curl ifconfig.me
+```
+
+Use that public IP for connections from outside your network.
+
+### In-Game Server Browser
+
+1. Launch Once Human on any platform: PC, PS5, Xbox, or mobile.
+2. From the main menu, open **Servers**.
+3. Search for the `SERVER_NAME` you set in `.env`.
+4. Select it and click **Join**.
+5. If you set a `SERVER_PASSWORD`, enter it when prompted.
+
+### Direct Connect
+
+If your server doesn’t appear in the browser:
+- **PC:** press `` ` `` or `~` to open the console, then type:
+  ```
+  open <your-public-ip>:27015
+  ```
+- **Console/Mobile:** use the direct-connect field and enter `<your-public-ip>:27015`
+
+### Connection Checklist
+
+- Ports forwarded: TCP/UDP `27015`, `27016`, `27017`
+- Server running: `docker compose ps`
+- Using the **public IP**, not a LAN address like `192.168.x.x`
+- Same game version — update the server with `docker compose pull && docker compose up -d --build` if needed
+
+### Cross-Platform Notes
+
+Once Human supports crossplay between PC, PS5, Xbox, and mobile. All clients connect the same way via IP or server browser. Players just need their own Once Human account/license and the server password if set.
 
 ## 5. Manage the Server
 
@@ -103,3 +136,7 @@ Forward these ports on your router to this host:
 - Reduce `MAX_PLAYERS`
 - Lower resource multipliers
 - Check CPU/RAM limits in `docker-compose.yml`
+
+## License
+
+This project is licensed under the GNU General Public License v3.0. See the repository [LICENSE](./LICENSE) file for details.
