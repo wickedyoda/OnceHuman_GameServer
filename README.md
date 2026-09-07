@@ -1,10 +1,10 @@
+![Once Human Logo](assets/once-human-logo.webp)
+
 # Once Human Game Server
 
 Dockerized Once Human dedicated server using SteamCMD.
 
 Created and maintained by WickedYoda.
-
-![Once Human Logo](assets/once-human-logo.webp)
 
 ## Quick Start
 
