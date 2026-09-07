@@ -68,3 +68,8 @@ Connect via RCON or server console. Common commands:
 ## Legal
 
 See [TERMS.md](./TERMS.md) for terms of use, disclaimer, and limitation of liability.
+
+## Documentation
+
+- [Setup Guide](./HOWTO.md) — step-by-step installation and configuration
+- [Security Assessment](./SECURITY.md) — vulnerabilities and hardening recommendations
