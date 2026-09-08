@@ -1,0 +1,5 @@
+# False positive: trivy report contains base64 data that matches private key pattern
+trivy-image-report.json
+gitleaks-report.json
+trivy-*.json
+gitleaks-*.json
