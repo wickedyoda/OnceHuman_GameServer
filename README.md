@@ -102,4 +102,4 @@ Licensed under GNU GPL v3.0. See [LICENSE](./LICENSE).
 
 - [Setup Guide](./HOWTO.md)
 - [Security Assessment](./SECURITY.md)
-- [Terms](./TERMS.md)
+- [Terms](./TERMS.md)# trigger
