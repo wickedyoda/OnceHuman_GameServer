@@ -1,0 +1,14 @@
+# Don't include in build context
+.git
+.gitignore
+.github
+*.md
+.env
+.env.example
+config/
+saves/
+*.json
+*.sarif
+*.log
+scripts/
+reports/

@@ -1,16 +1,32 @@
 #!/bin/bash
-# Once Human Server Startup Script
-# Uses Wine to run the Windows server binary in a Linux container
+# Once Human Server Startup Script (Wine-based, Linux container)
+# Installs server files on first run, then starts the server
 
 set -e
 
-SERVER_DIR="/home/wineuser/.wine/drive_c/oncehuman"
-CONFIG_DIR="${SERVER_DIR}/OnceHuman/Saved/Config/WindowsServer"
+SERVER_DIR="/home/oncehuman/server/OnceHuman"
+CONFIG_DIR="${SERVER_DIR}/Saved/Config/WindowsServer"
+STEAMCMD="/home/oncehuman/server/steamcmd/steamcmd.exe"
 
-# Create config directory if it doesn't exist
+# Check if server files are already installed
+if [ ! -f "${SERVER_DIR}/OnceHumanServer.exe" ]; then
+    echo "Installing Once Human server files via SteamCMD..."
+    xvfb-run -a wine ${STEAMCMD} \
+        +force_install_dir ${SERVER_DIR} \
+        +login anonymous \
+        +app_update 2139460 validate \
+        +quit 2>&1 || true
+fi
+
+# Create config directory
 mkdir -p "${CONFIG_DIR}"
 
-# Create default GameUserSettings.ini from environment or defaults
+# Copy config from mounted volume if present
+if [ -f "/config/GameUserSettings.ini" ]; then
+    cp /config/GameUserSettings.ini "${CONFIG_DIR}/GameUserSettings.ini"
+fi
+
+# Create default GameUserSettings.ini if not present
 if [ ! -f "${CONFIG_DIR}/GameUserSettings.ini" ]; then
     cat > "${CONFIG_DIR}/GameUserSettings.ini" << EOF
 [/Script/OnceHuman.GameUserSettings]
@@ -25,6 +41,11 @@ XPMultiplier=${XP_MULTIPLIER:-1.0}
 ResourceMultiplier=${RESOURCE_MULTIPLIER:-1.0}
 DropMultiplier=${DROP_MULTIPLIER:-1.0}
 EOF
+fi
+
+# Copy saves from mounted volume if present
+if [ -d "/saves" ]; then
+    cp -r /saves/* "${SERVER_DIR}/Saved/" 2>/dev/null || true
 fi
 
 # Start the server via Wine with virtual framebuffer
