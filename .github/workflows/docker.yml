@@ -61,12 +61,3 @@ jobs:
           tags: |
             ${{ steps.meta.outputs.image_name }}:latest
             ${{ steps.meta.outputs.image_name }}:${{ steps.version.outputs.version }}
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ steps.version.outputs.version }}
-          name: OnceHuman_GameServer - ${{ github.run_id }}@${{ steps.version.outputs.version }} - version ${{ steps.version.outputs.version }}
-          generate_release_notes: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
