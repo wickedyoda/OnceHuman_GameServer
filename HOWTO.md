@@ -1,13 +1,12 @@
 # Once Human Game Server - Setup Guide
 
-Host and play on your own self-hosted Once Human server via Docker + Wine + SteamCMD.
+Self-host your own Once Human dedicated server via Docker + Wine + SteamCMD.
 
 ## Quick Start
 
 ```bash
 git clone https://github.com/wickedyoda/OnceHuman_GameServer.git
 cd OnceHuman_GameServer
-
 cp .env.example .env
 docker compose up -d --build
 ```
@@ -24,6 +23,9 @@ ADMIN_PASSWORD=
 PVE_ENABLED=True
 DAY_LENGTH=60
 NIGHT_LENGTH=30
+XP_MULTIPLIER=1.0
+RESOURCE_MULTIPLIER=1.0
+DROP_MULTIPLIER=1.0
 ```
 
 ### GameUserSettings.ini
@@ -44,7 +46,7 @@ Forward these in your router settings.
 
 | Host Path | Container Path | Purpose |
 |-----------|----------------|---------|
-| `./saves/` | `/home/wineuser/.wine/drive_c/oncehuman/Saved` | World saves, configs, logs |
+| `./saves/` | `/home/oncehuman/server/OnceHuman/Saved` | World saves, configs, logs |
 | `./config/GameUserSettings.ini` | Read-only config | Server settings |
 
 ## Running
@@ -99,12 +101,37 @@ Once Human supports crossplay between PC, PS5, Xbox, and mobile.
 rcon-cli -host localhost -port 27017 -password <ADMIN_PASSWORD>
 ```
 
+## Production Deployment (recipe-host)
+
+For production on recipe-host (100.125.168.30), use host volume mounts:
+
+```bash
+docker run -d \
+  --name oncehuman \
+  --restart unless-stopped \
+  --read-only \
+  --security-opt no-new-privileges:true \
+  -p 27015:27015/udp \
+  -p 27015:27015/tcp \
+  -p 27016:27016/tcp \
+  -p 27016:27016/udp \
+  -p 27017:27017/tcp \
+  -v /root/once-human-saves:/home/oncehuman/server/OnceHuman/Saved \
+  -v /root/once-human-config/GameUserSettings.ini:/home/oncehuman/server/OnceHuman/Saved/Config/WindowsServer/GameUserSettings.ini:ro \
+  -e SERVER_NAME="My Once Human Server" \
+  -e MAX_PLAYERS=16 \
+  --tmpfs /tmp \
+  --tmpfs /run \
+  --tmpfs /home/oncehuman/.wine \
+  ghcr.io/wickedyoda/oncehuman_gameserver:latest
+```
+
 ## Troubleshooting
 
 | Issue | Solution |
 |-------|----------|
 | Won't start | `docker compose logs oncehuman` — check Wine errors |
-| Port in use | `ss -tlnp \| grep 27015` — kill conflicting process |
+| Port in use | `ss -tlnp | grep 27015` — kill conflicting process |
 | Players can't connect | Verify port forwarding; check firewall |
 | Performance | Reduce `MAX_PLAYERS`; increase resources |
 | Wine crash | Check `saves/OnceHuman/Saved/Logs/` |
