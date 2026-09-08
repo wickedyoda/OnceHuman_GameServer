@@ -11,6 +11,8 @@ jobs:
     permissions:
       contents: write
       packages: write
+    outputs:
+      image_name: ${{ steps.meta.outputs.image_name }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -35,6 +37,14 @@ jobs:
           echo "Next version: $next"
           echo "version=$next" >> "$GITHUB_OUTPUT"
 
+      - name: Compute image name
+        id: meta
+        run: |
+          # Convert repo name to lowercase for GHCR compatibility
+          REPO_NAME=$(echo "${{ github.event.repository.name }}" | tr 'A-Z' 'a-z')
+          echo "image_name=ghcr.io/${{ github.repository_owner }}/${REPO_NAME}" >> "$GITHUB_OUTPUT"
+          echo "Image name: ghcr.io/${{ github.repository_owner }}/${REPO_NAME}"
+
       - name: Login to GHCR
         uses: docker/login-action@v3
         with:
@@ -48,10 +58,9 @@ jobs:
           context: .
           push: true
           platforms: linux/amd64,linux/arm64
-          # github.repository is 'owner/repo' format, always lowercase
           tags: |
-            ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:${{ steps.version.outputs.version }}
+            ${{ steps.meta.outputs.image_name }}:latest
+            ${{ steps.meta.outputs.image_name }}:${{ steps.version.outputs.version }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
