@@ -1,142 +1,137 @@
-# Once Human Dedicated Server — HOWTO
+# Once Human Game Server - Setup Guide
 
-## 1. Prerequisites
+Host and play on your own Once Human Private Hive server.
 
-- Docker Engine 24+
-- Docker Compose v2+
-- 4GB RAM minimum
-- Ports 27015, 27016, 27017 available
+## ⚠️ Official Model Note
 
-## 2. Initial Setup
+Once Human custom servers are **rental-based** through official channels. This container provides a self-hosted alternative using Wine to run the Windows server binary. Character progress from official servers does **not** transfer to self-hosted servers.
+
+Official rental: https://www.oncehuman.game/2026/csfy/
+
+---
+
+## Quick Start
 
 ```bash
-# Clone this repo
 git clone https://github.com/wickedyoda/OnceHuman_GameServer.git
 cd OnceHuman_GameServer
 
-# Create env file
 cp .env.example .env
-nano .env
-```
+cp config/GameUserSettings.ini.example config/GameUserSettings.ini
+cp .env.example config/GameUserSettings.ini.example  # if missing
 
-Edit `.env` and set:
-- `SERVER_NAME`
-- `MAX_PLAYERS`
-- `SERVER_PASSWORD`
-- `ADMIN_PASSWORD`
-
-## 3. Start the Server
-
-```bash
 docker compose up -d --build
 ```
 
-Watch logs:
+---
+
+## Configuration
+
+### Environment Variables (`.env`)
+
+```env
+# Required (for Private Hive):
+# HIVE_LICENSE=  # Get from https://www.oncehuman.game/2026/csfy/
+
+# Server settings:
+SERVER_NAME=My Once Human Server
+MAX_PLAYERS=16
+SERVER_PASSWORD=
+ADMIN_PASSWORD=
+PVE_ENABLED=True
+DAY_LENGTH=60
+NIGHT_LENGTH=30
+```
+
+### GameUserSettings.ini
+
+Located at `config/GameUserSettings.ini`:
+
+```ini
+[/Script/OnceHuman.GameUserSettings]
+ServerName=My Once Human Server
+MaxPlayers=16
+ServerPassword=
+AdminPassword=
+PvEEnabled=True
+DayLength=60
+Night_LENGTH=30
+XPMultiplier=1.0
+ResourceMultiplier=1.0
+DropMultiplier=1.0
+```
+
+---
+
+## Ports
+
+| Port | Protocol | Purpose |
+|------|----------|---------|
+| 27015 | TCP/UDP | Game traffic |
+| 27016 | TCP/UDP | Query/heartbeat |
+| 27017 | TCP | RCON (admin) |
+
+Forward these in your router settings.
+
+---
+
+## Volume Mappings
+
+| Host Path | Container Path | Purpose |
+|-----------|----------------|---------|
+| `./saves/` | `/home/wineuser/.wine/drive_c/oncehuman/Saved` | World saves, configs, logs |
+| `./config/GameUserSettings.ini` | Read-only config | Server settings |
+
+---
+
+## Running
+
 ```bash
-docker compose logs -f oncehuman
+# Start
+docker compose up -d
+
+# View logs
+docker compose logs -f
+
+# Stop
+docker compose down
 ```
 
-Wait for:
-```
-Server is ready
-```
+---
 
-## 4. Connect
+## Admin Access
 
-### Find Your Server IP
-
-On the server host:
-```bash
-curl ifconfig.me
-```
-
-Use that public IP for connections from outside your network.
-
-### In-Game Server Browser
-
-1. Launch Once Human on any platform: PC, PS5, Xbox, or mobile.
-2. From the main menu, open **Servers**.
-3. Search for the `SERVER_NAME` you set in `.env`.
-4. Select it and click **Join**.
-5. If you set a `SERVER_PASSWORD`, enter it when prompted.
-
-### Direct Connect
-
-If your server doesn’t appear in the browser:
-- **PC:** press `` ` `` or `~` to open the console, then type:
-  ```
-  open <your-public-ip>:27015
-  ```
-- **Console/Mobile:** use the direct-connect field and enter `<your-public-ip>:27015`
-
-### Connection Checklist
-
-- Ports forwarded: TCP/UDP `27015`, `27016`, `27017`
-- Server running: `docker compose ps`
-- Using the **public IP**, not a LAN address like `192.168.x.x`
-- Same game version — update the server with `docker compose pull && docker compose up -d --build` if needed
-
-### Cross-Platform Notes
-
-Once Human supports crossplay between PC, PS5, Xbox, and mobile. All clients connect the same way via IP or server browser. Players just need their own Once Human account/license and the server password if set.
-
-## 5. Manage the Server
+### In-Game
+Connect to your server, open console, use `/admin` commands.
 
 ### RCON
-Use any RCON client with:
-- Host: `localhost:27017`
-- Password: value of `ADMIN_PASSWORD`
-
-### Useful Commands
-```
-listplayers
-kick <name>
-ban <name>
-saveworld
-```
-
-### Restart
 ```bash
-docker compose restart oncehuman
+# Example with rcon-cli (install via pip)
+rcon-cli -host localhost -port 27017 -password <ADMIN_PASSWORD>
 ```
 
-### Update Server Files
-```bash
-docker compose pull
-docker compose up -d --build
-```
-
-## 6. Backup
-
-Back up these directories regularly:
-- `saved/` — world save data
-- `config/` — server settings
-
-## 7. Port Forwarding
-
-Forward these ports on your router to this host:
-- TCP/UDP 27015
-- TCP/UDP 27016
-- TCP/UDP 27017
+---
 
 ## Troubleshooting
 
-**Friends can't connect:**
-- Check port forwarding
-- Verify firewall allows ports
-- Confirm server is running: `docker compose ps`
-- Use public IP, not 192.168.x.x
+| Issue | Solution |
+|-------|----------|
+| Won't start | `docker compose logs oncehuman` — check for Wine errors |
+| Port in use | `ss -tlnp \| grep 27015` — kill conflicting process |
+| Players can't connect | Verify port forwarding; check firewall (`ufw status`) |
+| Performance | Reduce `MAX_PLAYERS`; increase allocated RAM/CPU |
+| Wine crash | Check `saves/OnceHuman/Saved/Logs/` for errors |
+| Save file corrupted | Stop container; restore from backup |
 
-**Server won't start:**
-- Check logs: `docker compose logs`
-- Verify ports aren't in use
-- Ensure enough RAM available
+---
 
-**Performance issues:**
-- Reduce `MAX_PLAYERS`
-- Lower resource multipliers
-- Check CPU/RAM limits in `docker-compose.yml`
+## Character Transfer
 
-## License
+Once Human custom servers have **separate character data** from official servers. Use the in-game "Server Transfer" feature if available.
 
-This project is licensed under the GNU General Public License v3.0. See the repository [LICENSE](./LICENSE) file for details.
+---
+
+## References
+
+- Official Custom Server Guide: https://www.oncehuman.game/2026/csfy/
+- Server Setup Wiki: https://www.oncehuman.wiki/guides/dedicated-server.html
