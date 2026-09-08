@@ -1,0 +1,22 @@
+{
+  "SchemaVersion": 2,
+  "Trivy": {
+    "Version": "0.74.0"
+  },
+  "ReportID": "01a081df-37c2-7a20-9896-38849b649cd9",
+  "CreatedAt": "2026-09-08T11:34:44.802665876-05:00",
+  "ArtifactID": "sha256:7e5aa831f3556de48c01bbcbaa321112af0de772b843d9af59519fef091709cb",
+  "ArtifactName": "/root/docker/once-human",
+  "ArtifactType": "repository",
+  "Metadata": {
+    "RepoURL": "https://github.com/wickedyoda/OnceHuman_GameServer.git",
+    "Branch": "main",
+    "Tags": [
+      "1.01"
+    ],
+    "Commit": "46a65f19952f12f2005ba476fe6be81a06680716",
+    "CommitMsg": "Merge pull request #25 from wickedyoda/fix-ghcr-lowercase-script\n\nfix: compute lowercase image name via shell script",
+    "Author": "WickedYoda \u003c68271168+wickedyoda@users.noreply.github.com\u003e",
+    "Committer": "GitHub \u003cnoreply@github.com\u003e"
+  }
+}

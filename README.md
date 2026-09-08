@@ -1,105 +1,179 @@
-# Once Human Game Server
+# Once Human Dedicated Server
 
-Dockerized Once Human dedicated server using Wine and SteamCMD.
+**Self-host your own Once Human game server in Docker.**
 
-Created and maintained by WickedYoda.
+This repo provides a Dockerized dedicated server for Once Human (Steam App ID: 2139460), running via Wine on Linux. Built for self-hosted deployment on your own hardware.
 
-![Once Human Logo](assets/once-human-logo.webp)
+> Created and maintained by **WickedYoda**.
+> Licensed under **GNU General Public License v3.0 (GPLv3)**.
 
-## ⚠️ Note
-
-Once Human server binaries run on Windows. This image uses Wine via SteamCMD to install and run the server on Linux. Saves and configs are mapped to the host so they persist across container updates.
-
-## Requirements
-
-- Docker v24+ and Docker Compose v2+
-- Linux host with 8GB+ RAM (16GB recommended for 16+ players)
-- 30GB+ free disk space
-- Wine support (included in scottyhardy/docker-wine:latest)
+---
 
 ## Quick Start
 
+### Prerequisites
+- Docker + Docker Compose v2
+- Steam account with Once Human (free)
+- Ports 27015-27017 forwarded on your router (TCP+UDP)
+
+### 1. Clone & Configure
+
 ```bash
+git clone https://github.com/wickedyoda/OnceHuman_GameServer.git
+cd OnceHuman_GameServer
 cp .env.example .env
-docker compose up -d --build
 ```
 
-## Docker Compose
+Edit `.env` to set server name, passwords, and multipliers. Edit `config/GameUserSettings.ini` for advanced settings.
 
-```yaml
-version: '3.8'
+### 2. Build & Run
 
-services:
-  oncehuman:
-    build: .
-    image: ghcr.io/wickedyoda/oncehuman_gameserver:latest
-    container_name: oncehuman
-    restart: unless-stopped
-    ports:
-      - "27015:27015/udp"
-      - "27015:27015/tcp"
-      - "27016:27016/tcp"
-      - "27016:27016/udp"
-      - "27017:27017/tcp"
-    volumes:
-      - ./saves:/home/wineuser/.wine/drive_c/oncehuman/Saved
-      - ./config/GameUserSettings.ini:/home/wineuser/.wine/drive_c/oncehuman/OnceHuman/Saved/Config/WindowsServer/GameUserSettings.ini:ro
-    environment:
-      - SERVER_NAME=${SERVER_NAME:-My Once Human Server}
-      - MAX_PLAYERS=${MAX_PLAYERS:-16}
-      - SERVER_PASSWORD=${SERVER_PASSWORD:-}
-      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-}
-      - PVE_ENABLED=${PVE_ENABLED:-True}
-      - DAY_LENGTH=${DAY_LENGTH:-60}
-      - NIGHT_LENGTH=${NIGHT_LENGTH:-30}
-      - XP_MULTIPLIER=${XP_MULTIPLIER:-1.0}
-      - RESOURCE_MULTIPLIER=${RESOURCE_MULTIPLIER:-1.0}
-      - DROP_MULTIPLIER=${DROP_MULTIPLIER:-1.0}
-    deploy:
-      resources:
-        limits:
-          cpus: '2.0'
-          memory: 4G
-        reservations:
-          cpus: '1.0'
-          memory: 2G
+```bash
+docker compose build
+docker compose up -d
 ```
+
+The first run will:
+- Initialize a Wine prefix
+- Download server files via SteamCMD (~130 GB, requires Steam login)
+- Start the server
+
+Subsequent runs start immediately — files persist in `./saves`.
+
+### 3. Connect
+
+Find your public IP:
+```bash
+curl ifconfig.me
+```
+
+In-game: Servers → search for your server name → join.
+
+Direct connect: Open console (`~`) and type:
+```
+open <your-public-ip>:27015
+```
+
+### 4. Admin
+
+RCON via `rcon-cli`:
+```bash
+rcon-cli -host localhost -port 27017 -password "your-admin-password"
+```
+
+---
+
+## Host Volume Mounts
+
+| Host Path | Container Path | Purpose |
+|---|---|---|
+| `./saves` | `/home/oncehuman/server/OnceHuman/Saved` | World saves, configs, logs |
+| `./config/GameUserSettings.ini` | `/home/oncehuman/server/OnceHuman/Saved/Config/WindowsServer/GameUserSettings.ini:ro` | Server settings (read-only) |
+
+**Production on recipe-host:** Use host path mounts:
+- `/root/once-human-saves` → `/home/oncehuman/server/OnceHuman/Saved`
+- `/root/once-human-config/GameUserSettings.ini` → container config (read-only)
+
+---
 
 ## Configuration
 
-- `.env` — container environment variables
-- `config/GameUserSettings.ini` — mounted server config (read-only)
-- `saved/` — persistent world data
-
-### Environment Variables
+### `.env` Variables
 
 | Variable | Default | Description |
 |---|---|---|
-| `SERVER_NAME` | My Once Human Server | Public server name |
-| `MAX_PLAYERS` | 16 | Max connected players |
-| `SERVER_PASSWORD` | *(empty)* | Join password |
-| `ADMIN_PASSWORD` | *(empty)* | RCON/admin password |
-| `PVE_ENABLED` | True | PvE or PvP |
+| `SERVER_NAME` | "My Once Human Server" | Server name shown in browser |
+| `MAX_PLAYERS` | 16 | Max concurrent players |
+| `SERVER_PASSWORD` | "" | Join password (leave empty for public) |
+| `ADMIN_PASSWORD` | "" | RCON admin password |
+| `PVE_ENABLED` | True | PvE mode (False = PvP) |
+| `DAY_LENGTH` | 60 | Day cycle length (minutes) |
+| `NIGHT_LENGTH` | 30 | Night cycle length (minutes) |
+| `XP_MULTIPLIER` | 1.0 | Experience gain multiplier |
+| `RESOURCE_MULTIPLIER` | 1.0 | Resource drop multiplier |
+| `DROP_MULTIPLIER` | 1.0 | Item drop multiplier |
+
+### `config/GameUserSettings.ini`
+
+Advanced settings file. Mount as read-only into the container. See `config/GameUserSettings.ini` for the template.
+
+---
 
 ## Ports
 
 | Port | Protocol | Purpose |
 |---|---|---|
-| 27015 | TCP/UDP | Game |
-| 27016 | TCP/UDP | Query |
+| 27015 | TCP + UDP | Game traffic |
+| 27016 | TCP + UDP | Query/Heartbeat |
 | 27017 | TCP | RCON |
 
-## Admin Commands
+Forward all three (TCP+UDP on 27015/27016, TCP on 27017) on your router to the Docker host IP.
 
-- `listplayers` — show connected players
-- `kick <player>` — kick a player
-- `ban <player>` — ban a player
-- `saveworld` — force save
+---
 
-## Legal
+## Security
 
-Licensed under GNU GPL v3.0. See [LICENSE](./LICENSE).
+- Runs as non-root user `oncehuman` (UID 1000)
+- Read-only root filesystem (`read_only: true`)
+- No-new-privileges security opt
+- tmpfs for `/tmp`, `/run`, and Wine prefix
+- Host files mounted read-only where applicable
 
-- [Setup Guide](./HOWTO.md)
-- [Security Assessment](./SECURITY.md)
-- [Terms](./TERMS.md)# trigger
+---
+
+## Resource Limits
+
+| Players | CPU Limit | RAM Limit |
+|---|---|---|
+| 1-8 | 2.0 / 1.0 reserved | 4GB / 2GB reserved |
+
+For larger servers (9-16 players), increase to 4 cores / 8GB RAM.
+
+---
+
+## Troubleshooting
+
+| Issue | Fix |
+|---|---|
+| Server not visible in browser | Forward ports 27015-27017 (TCP+UDP); wait 2-5 min for query registration |
+| "Missing configuration" from SteamCMD | Use `+login <your_steam_user> <password>` instead of anonymous |
+| Wine prefix errors | Delete `/home/oncehuman/.wine` and restart; will reinitialize |
+| Players can't connect | Verify public IP, not LAN IP; check firewall |
+
+---
+
+## Files
+
+```
+.
+├── Dockerfile              # Debian:12.15-slim + Wine + SteamCMD
+├── docker-compose.yml      # Service definition + resource limits
+├── entrypoint.sh           # Wine prefix init + SteamCMD install + server start
+├── .env.example            # Environment variables template
+├── config/
+│   └── GameUserSettings.ini
+├── saved/
+│   └── .gitkeep
+├── LICENSE                 # GPLv3
+├── README.md               # This file
+├── HOWTO.md                # Detailed setup guide
+├── SECURITY.md             # Security considerations
+├── TERMS.md                # Terms of use reference
+└── .dockerignore           # Excludes docs/configs from build context
+```
+
+---
+
+## License
+
+GNU General Public License v3.0 — see [LICENSE](LICENSE) for the full text.
+
+**Created and maintained by WickedYoda.**
+
+---
+
+## Acknowledgments
+
+- SteamCMD by Valve Corporation — https://developer.valvesoftware.com/wiki/SteamCMD
+- Wine — https://www.winehq.org/
+- Once Human — https://www.oncehuman.game/

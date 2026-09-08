@@ -1,57 +1,103 @@
-# Once Human Game Server — Security Assessment
+# Once Human Game Server - Security Considerations
 
-## Findings
+## Overview
 
-### High
+This document covers the security posture of the Once Human Dedicated Server Docker container and recommendations for production deployment.
 
-1. **RCON exposed without bind restriction**
-   - `27017` is published to `0.0.0.0` in compose.
-   - Impact: anyone on the network/internet can attempt RCON brute-force if the host firewall doesn’t restrict it.
-   - Fix: bind RCON to `127.0.0.1` and expose only game/query ports, or restrict via host firewall.
+## Container Security
 
-2. **Secrets in environment variables**
-   - `SERVER_PASSWORD` and `ADMIN_PASSWORD` are passed via compose env.
-   - Impact: visible in `docker inspect`, process lists, and potentially logs.
-   - Fix: use Docker secrets or a restricted `.env` file with `chmod 600`.
+### Non-Root Execution
+The server runs as user `oncehuman` (UID 1000), not root. This limits the impact of any potential exploit.
 
-3. **Running as non-root but with broad home directory**
-   - User `oncehuman` owns `/opt/oncehuman`.
-   - Impact: if the game server process is compromised, attacker has write access to server binaries.
-   - Fix: split runtime writable paths from install path; make server install read-only.
+### Read-Only Root Filesystem
+The container root filesystem is mounted read-only (`read_only: true` in docker-compose). Only specific directories are writable:
+- `/tmp` (tmpfs)
+- `/run` (tmpfs)
+- `/home/oncehuman/.wine` (tmpfs or host volume)
 
-### Medium
+### No-New-Privileges
+Security option `no-new-privileges:true` prevents processes from gaining additional privileges via setuid binaries or capabilities.
 
-4. **No image provenance or signature verification**
-   - Base image `steamcmd/steamcmd:latest` is pulled without digest pinning.
-   - Impact: supply-chain compromise via upstream image change.
-   - Fix: pin to a digest SHA and enable Docker Content Trust.
+### tmpfs Mounts
+Temporary filesystems for `/tmp`, `/run`, and `.wine` prevent persistent storage of sensitive data on the host.
 
-5. **No resource hard limit enforcement on some hosts**
-   - `deploy.resources` only works in swarm/with `--compatibility`.
-   - Impact: a runaway server can starve the host.
-   - Fix: add `mem_limit`/`cpus` at top level or run on a constrained VM/container host.
+## Network Security
 
-6. **Saved/config world data not encrypted at rest**
-   - `saved/` is bind-mounted as plain files.
-   - Impact: host compromise exposes world state and player data.
-   - Fix: optional host-level encryption on the mount path.
+### Port Exposure
+Only required ports are exposed:
+- 27015 (TCP/UDP) - game traffic
+- 27016 (TCP/UDP) - query/heartbeat  
+- 27017 (TCP) - RCON
 
-### Low
+### Firewall Considerations
+- Ensure host firewall allows only these ports
+- Use a reverse proxy if exposing RCON externally (not recommended for untrusted networks)
+- Keep RCON password strong and unique
 
-7. **Anonymous SteamCMD login**
-   - `+login anonymous` is standard for public servers.
-   - Impact: minimal; Valve’s anonymous install is intended for this use.
-   - Mitigation: restrict outbound Steam traffic if policy requires.
+## SteamCMD Security
 
-8. **Port forwarding exposure**
-   - Game ports open to internet increases scan surface.
-   - Impact: DDoS, probing, exploit attempts against game service.
-   - Fix: place behind Cloudflare Spectrum/IPTables rate limits or run a VPN-only allowlist.
+### Steam Account
+- Use a dedicated Steam account for the server, not your personal account
+- Enable Steam Guard (2FA)
+- Do not share Steam credentials
 
-## Recommended Hardening
+### SteamCMD Downloads
+- Always validate downloads (`validate` flag in SteamCMD)
+- Verify file integrity after download
+- Run SteamCMD as a non-root user
 
-- Add `read_only: true` to the service and use tmpfs for writable runtime dirs.
-- Move RCON to a unix socket or localhost-only bind.
-- Add `.env` to `.gitignore` (already present) and enforce `chmod 600 .env`.
-- Pin base image by digest and scan with Trivy/Grype on update.
-- Run `docker compose up` with `--pull always` in CI and diff updated binaries.
+## Wine Security
+
+### Wine Prefix Isolation
+- Wine prefix (`~/.wine`) contains registry and system files
+- Keep it writable only by the `oncehuman` user
+- Do not mount host paths into the Wine prefix
+
+### Wine Binary
+- Use official Wine packages from Debian repositories
+- Verify package signatures on installation
+
+## Host Security
+
+### Volume Mounts
+- `./saves` - world data, may contain player data (GDPR consideration)
+- `./config/GameUserSettings.ini` - mounted read-only, no host writes
+- Ensure host directories have appropriate permissions (owned by Docker user or root)
+
+### Docker Socket
+- Do not mount Docker socket into the container
+- Container should not have privileged mode
+
+### Resource Limits
+- CPU and memory limits prevent resource exhaustion
+- Configure limits appropriate to your hardware
+
+## Monitoring
+
+- Monitor container logs for unexpected behavior
+- Watch for unusual network connections
+- Track resource usage (CPU, memory, disk)
+
+## Known Limitations
+
+- The server runs Windows binaries via Wine — inherent limitations of Wine on Linux apply
+- SteamCMD requires Steam account credentials at runtime
+- Multi-arch builds (arm64) require WineARM64 — not tested in this setup
+
+## Updates
+
+Keep the base image updated:
+```bash
+docker compose pull
+docker compose up -d
+```
+
+Or rebuild locally to pick up security patches:
+```bash
+docker compose build --no-cache
+docker compose up -d
+```
+
+## License
+
+GPL-3.0 — Created and maintained by WickedYoda
