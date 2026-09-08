@@ -4,6 +4,8 @@ Dockerized Once Human dedicated server using Wine and SteamCMD.
 
 Created and maintained by WickedYoda.
 
+![Once Human Logo](assets/once-human-logo.webp)
+
 ## ⚠️ Note
 
 Once Human server binaries run on Windows. This image uses Wine via SteamCMD to install and run the server on Linux. Saves and configs are mapped to the host so they persist across container updates.
