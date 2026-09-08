@@ -4,16 +4,9 @@ Dockerized Once Human dedicated server using Wine and SteamCMD.
 
 Created and maintained by WickedYoda.
 
-## ⚠️ Important: Game Server Model
+## ⚠️ Note
 
-Once Human does **not** provide a traditional self-hosted dedicated server via SteamCMD. The game uses an official rental-based custom server system. This repo provides:
-
-- A **Docker image** running the Once Human client/server binary via Wine (App ID `2139460`)
-- **Persistent volume mappings** for saves and configs
-- **Security scanning reports**: `trivy-report.json`, `trivy-image-report.json`, `gitleaks-report.json`
-- **Documentation**: setup guide, security notes, terms
-
-If you need a true dedicated server, rent through the official Once Human system: https://www.oncehuman.game/2026/csfy/
+Once Human server binaries run on Windows. This image uses Wine via SteamCMD to install and run the server on Linux. Saves and configs are mapped to the host so they persist across container updates.
 
 ## Requirements
 
@@ -60,7 +53,6 @@ services:
       - XP_MULTIPLIER=${XP_MULTIPLIER:-1.0}
       - RESOURCE_MULTIPLIER=${RESOURCE_MULTIPLIER:-1.0}
       - DROP_MULTIPLIER=${DROP_MULTIPLIER:-1.0}
-      - HIVE_LICENSE=${HIVE_LICENSE:-}
     deploy:
       resources:
         limits:
@@ -73,7 +65,6 @@ services:
 
 ## Configuration
 
-Server settings:
 - `.env` — container environment variables
 - `config/GameUserSettings.ini` — mounted server config (read-only)
 - `saved/` — persistent world data
@@ -82,7 +73,6 @@ Server settings:
 
 | Variable | Default | Description |
 |---|---|---|
-| `HIVE_LICENSE` | *(empty)* | Private Hive license token |
 | `SERVER_NAME` | My Once Human Server | Public server name |
 | `MAX_PLAYERS` | 16 | Max connected players |
 | `SERVER_PASSWORD` | *(empty)* | Join password |
