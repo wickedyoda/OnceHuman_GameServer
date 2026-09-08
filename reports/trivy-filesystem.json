@@ -1,0 +1,19 @@
+{
+  "SchemaVersion": 2,
+  "Trivy": {
+    "Version": "0.74.0"
+  },
+  "ReportID": "01a07ea8-914f-77f9-ab19-e22c66db095b",
+  "CreatedAt": "2026-09-07T20:36:11.599525494-05:00",
+  "ArtifactID": "sha256:b5aff896a38ca7a79515b0b95512b029d0cc81d69c421ed9e553b658b2592b6b",
+  "ArtifactName": ".",
+  "ArtifactType": "repository",
+  "Metadata": {
+    "RepoURL": "https://github.com/wickedyoda/OnceHuman_GameServer.git",
+    "Branch": "main",
+    "Commit": "fe103cccca4c339418cb236123b8ed5836d8bc82",
+    "CommitMsg": "docs: reorganize README with full compose, fix Dockerfile for Wine-based SteamCMD install\n\n- Updated README with complete docker-compose.yml content\n- Fixed Dockerfile to use scottyhardy/docker-wine image with proper SteamCMD install\n- Updated entrypoint.sh to use xvfb-run for headless Wine execution\n- Updated docker-compose.yml with proper port mappings and env vars\n- Updated .env.example with Hive_LICENSE and server settings\n- Updated HOWTO.md with troubleshooting and setup guide\n- Removed duplicate reports and fixed .gitignore\n\nSecurity scan results:\n- trivy fs: clean (no vulns in repo files)\n- gitleaks: no secrets found\n- trivy image: Ubuntu base with known CVEs - use updated base images",
+    "Author": "Jarvis \u003cjarvis@wickedyoda.local\u003e",
+    "Committer": "Jarvis \u003cjarvis@wickedyoda.local\u003e"
+  }
+}
