@@ -1,12 +1,22 @@
 #!/bin/bash
 # Once Human Server Startup Script (Wine-based, Linux container)
-# Installs server files on first run, then starts the server
+# Installs server files on first run, then starts the once-human server
 
 set -e
 
 SERVER_DIR="/home/oncehuman/server/OnceHuman"
 CONFIG_DIR="${SERVER_DIR}/Saved/Config/WindowsServer"
 STEAMCMD="/home/oncehuman/server/steamcmd/steamcmd.exe"
+WINE_PREFIX="/home/oncehuman/.wine"
+
+# Initialize Wine prefix if it doesn't exist
+if [ ! -d "${WINE_PREFIX}" ]; then
+    echo "Initializing Wine prefix..."
+    export WINEPREFIX="${WINE_PREFIX}"
+    xvfb-run -a wineboot --init 2>/dev/null || true
+fi
+
+export WINEPREFIX="${WINE_PREFIX}"
 
 # Check if server files are already installed
 if [ ! -f "${SERVER_DIR}/OnceHumanServer.exe" ]; then
