@@ -1,16 +1,17 @@
 #!/bin/bash
-set -euo pipefail
+# Rotate security reports - keep last 2 of each type
+REPORT_DIR=".security-reports"
 
-# Security report rotation: keep last 2 of each report type
-REPORT_DIR="."
-KEEP=2
+for prefix in trivy-report trivy-image gitleaks; do
+    files=($(ls -t ${REPORT_DIR}/${prefix}*.json 2>/dev/null))
+    count=${#files[@]}
+    if [ $count -gt 2 ]; then
+        for ((i=2; i<count; i++)); do
+            rm -f "${files[$i]}"
+            echo "Removed old report: ${files[$i]}"
+        done
+    fi
+done
 
-rotate() {
-  local pattern="$1"
-  ls -1t ${pattern} 2>/dev/null | tail -n +$((KEEP+1)) | xargs -r rm -f || true
-}
-
-rotate "trivy-report-*.json"
-rotate "trivy-image-report-*.json"
-rotate "gitleaks-report-*.json"
-rotate "trivy-report-*.sarif"
+echo "Reports remaining:"
+ls -1 ${REPORT_DIR}/*.json 2>/dev/null | wc -l
