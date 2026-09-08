@@ -1,12 +1,6 @@
 # Once Human Game Server - Setup Guide
 
-Host and play on your own Once Human Private Hive server.
-
-## ⚠️ Official Model Note
-
-Once Human custom servers are **rental-based** through official channels. This container provides a self-hosted alternative using Wine to run the Windows server binary. Character progress from official servers does **not** transfer to self-hosted servers.
-
-Official rental: https://www.oncehuman.game/2026/csfy/
+Host and play on your own self-hosted Once Human server via Docker + Wine + SteamCMD.
 
 ## Quick Start
 
@@ -23,10 +17,6 @@ docker compose up -d --build
 ### Environment Variables (`.env`)
 
 ```env
-# Private Hive license (from https://www.oncehuman.game/2026/csfy/ if you have one):
-HIVE_LICENSE=
-
-# Server settings:
 SERVER_NAME=My Once Human Server
 MAX_PLAYERS=16
 SERVER_PASSWORD=
@@ -74,25 +64,17 @@ docker compose down
 
 ### Find Your Server IP
 
-On the server host:
-
 ```bash
 curl ifconfig.me
 ```
 
-Use that public IP for connections from outside your network.
-
 ### In-Game Server Browser
 
-1. Launch Once Human on any platform: PC, PS5, Xbox, or mobile.
-2. From the main menu, open **Servers**.
-3. Search for the `SERVER_NAME` you set in `.env`.
-4. Select it and click **Join**.
-5. If you set a `SERVER_PASSWORD`, enter it when prompted.
+1. Launch Once Human on PC, PS5, Xbox, or mobile.
+2. Open **Servers**, search for your `SERVER_NAME`.
+3. Join and enter password if set.
 
 ### Direct Connect
-
-If your server doesn't appear in the browser:
 
 - **PC:** press `` ` `` or `~` to open the console, then type:
   ```
@@ -109,12 +91,11 @@ If your server doesn't appear in the browser:
 
 ### Cross-Platform Notes
 
-Once Human supports crossplay between PC, PS5, Xbox, and mobile. All clients connect the same way via IP or server browser. Players just need their own Once Human account/license and the server password if set.
+Once Human supports crossplay between PC, PS5, Xbox, and mobile.
 
 ### RCON
 
 ```bash
-# Example with rcon-cli (install via pip)
 rcon-cli -host localhost -port 27017 -password <ADMIN_PASSWORD>
 ```
 
@@ -129,11 +110,6 @@ rcon-cli -host localhost -port 27017 -password <ADMIN_PASSWORD>
 | Wine crash | Check `saves/OnceHuman/Saved/Logs/` |
 | Save file corrupted | Stop container; restore from backup |
 
-## Character Transfer
-
-Official Once Human servers and custom/community servers are **separate** per official announcements. Characters created on official servers do **not appear** in custom servers and cannot be imported. Players joining your self-hosted server must create new characters.
-
 ## References
 
-- Official Custom Server Guide: https://www.oncehuman.game/2026/csfy/
 - Server Setup Wiki: https://www.oncehuman.wiki/guides/dedicated-server.html
