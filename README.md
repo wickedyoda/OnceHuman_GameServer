@@ -1,105 +1,43 @@
-# Once Human Game Server
+# Once Human Dedicated Server
 
-Dockerized Once Human dedicated server using Wine and SteamCMD.
+**⚠️ IMPORTANT: Self-Hosted Server NOT Available**
 
-Created and maintained by WickedYoda.
+After extensive testing, **Once Human does not provide a self-hostable dedicated server**. The `app_update 2139460` is the full game client (~131 GB), and SteamCMD returns "Missing configuration" for anonymous downloads because the app requires Steam ownership.
 
-![Once Human Logo](assets/once-human-logo.webp)
+## Official Solution: NetEase Custom Servers
 
-## ⚠️ Note
+Once Human officially launched **Custom Servers** on June 18, 2025. These are NetEase-hosted rental servers where you:
+- Rent an official server instance from in-game
+- Customize world rules and settings
+- Control your own multiplayer experience
 
-Once Human server binaries run on Windows. This image uses Wine via SteamCMD to install and run the server on Linux. Saves and configs are mapped to the host so they persist across container updates.
+### How to Access:
+1. Launch Once Human on Steam
+2. In-game, navigate to **Custom Server** creation
+3. Rent a server with your preferred settings
 
-## Requirements
+## What This Repo Documents
 
-- Docker v24+ and Docker Compose v2+
-- Linux host with 8GB+ RAM (16GB recommended for 16+ players)
-- 30GB+ free disk space
-- Wine support (included in scottyhardy/docker-wine:latest)
+This repository documents the **attempted** self-hosting approach that does not work:
 
-## Quick Start
+- Docker image build process
+- Valve SteamCMD usage
+- Wine configuration for Windows games
+- Security hardening patterns
 
-```bash
-cp .env.example .env
-docker compose up -d --build
+**It does NOT provide a functional Once Human dedicated server.**
+
+## Technical Details
+
+### Why SteamCMD Fails
+```
+ERROR! Failed to install app '2139460' (Missing configuration)
 ```
 
-## Docker Compose
+App ID 2139460 requires:
+- Steam account ownership
+- No public anonymous download endpoint
 
-```yaml
-version: '3.8'
-
-services:
-  oncehuman:
-    build: .
-    image: ghcr.io/wickedyoda/oncehuman_gameserver:latest
-    container_name: oncehuman
-    restart: unless-stopped
-    ports:
-      - "27015:27015/udp"
-      - "27015:27015/tcp"
-      - "27016:27016/tcp"
-      - "27016:27016/udp"
-      - "27017:27017/tcp"
-    volumes:
-      - ./saves:/home/wineuser/.wine/drive_c/oncehuman/Saved
-      - ./config/GameUserSettings.ini:/home/wineuser/.wine/drive_c/oncehuman/OnceHuman/Saved/Config/WindowsServer/GameUserSettings.ini:ro
-    environment:
-      - SERVER_NAME=${SERVER_NAME:-My Once Human Server}
-      - MAX_PLAYERS=${MAX_PLAYERS:-16}
-      - SERVER_PASSWORD=${SERVER_PASSWORD:-}
-      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-}
-      - PVE_ENABLED=${PVE_ENABLED:-True}
-      - DAY_LENGTH=${DAY_LENGTH:-60}
-      - NIGHT_LENGTH=${NIGHT_LENGTH:-30}
-      - XP_MULTIPLIER=${XP_MULTIPLIER:-1.0}
-      - RESOURCE_MULTIPLIER=${RESOURCE_MULTIPLIER:-1.0}
-      - DROP_MULTIPLIER=${DROP_MULTIPLIER:-1.0}
-    deploy:
-      resources:
-        limits:
-          cpus: '2.0'
-          memory: 4G
-        reservations:
-          cpus: '1.0'
-          memory: 2G
-```
-
-## Configuration
-
-- `.env` — container environment variables
-- `config/GameUserSettings.ini` — mounted server config (read-only)
-- `saved/` — persistent world data
-
-### Environment Variables
-
-| Variable | Default | Description |
-|---|---|---|
-| `SERVER_NAME` | My Once Human Server | Public server name |
-| `MAX_PLAYERS` | 16 | Max connected players |
-| `SERVER_PASSWORD` | *(empty)* | Join password |
-| `ADMIN_PASSWORD` | *(empty)* | RCON/admin password |
-| `PVE_ENABLED` | True | PvE or PvP |
-
-## Ports
-
-| Port | Protocol | Purpose |
-|---|---|---|
-| 27015 | TCP/UDP | Game |
-| 27016 | TCP/UDP | Query |
-| 27017 | TCP | RCON |
-
-## Admin Commands
-
-- `listplayers` — show connected players
-- `kick <player>` — kick a player
-- `ban <player>` — ban a player
-- `saveworld` — force save
-
-## Legal
-
-Licensed under GNU GPL v3.0. See [LICENSE](./LICENSE).
-
-- [Setup Guide](./HOWTO.md)
-- [Security Assessment](./SECURITY.md)
-- [Terms](./TERMS.md)# trigger
+### Related Research
+- [Once Human Custom Servers Announcement](https://www.oncehuman.game/2026/csfy/)
+- [NetEase News: Custom Servers Launch](https://www.neteasegames.com/news/20250620/37000_1242171.html)

@@ -1,0 +1,19 @@
+{
+  "SchemaVersion": 2,
+  "Trivy": {
+    "Version": "0.74.0"
+  },
+  "ReportID": "01a081ed-669d-72ec-ae95-a62268ac6207",
+  "CreatedAt": "2026-09-08T11:50:14.30119468-05:00",
+  "ArtifactID": "sha256:d17dc2831de2d011f1f7308056a605a0b06a7d64a2653b6f68fadc2ca0a6707c",
+  "ArtifactName": "/root/docker/once-human",
+  "ArtifactType": "repository",
+  "Metadata": {
+    "RepoURL": "https://github.com/wickedyoda/OnceHuman_GameServer.git",
+    "Branch": "main",
+    "Commit": "7da30da1ac96f71693ff366cff3f47d17a2390ec",
+    "CommitMsg": "Merge pull request #26 from wickedyoda/fix-wine-binary\n\nfix: ensure wine binary is available during build",
+    "Author": "WickedYoda \u003c68271168+wickedyoda@users.noreply.github.com\u003e",
+    "Committer": "GitHub \u003cnoreply@github.com\u003e"
+  }
+}
