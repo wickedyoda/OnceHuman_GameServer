@@ -25,12 +25,9 @@ jobs:
         run: |
           OWNER="${{ github.repository_owner }}"
           REPO="${{ github.event.repository.name }}"
-
           tags=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             "https://api.github.com/repos/$OWNER/$REPO/git/refs/tags" | grep -o '"ref": "refs/tags/[^"]*"' | sed 's/.*refs\/tags\///')
-
-          latest=$(echo "$tags" | grep -E '^v?1\.[0-9]+$' | sed 's/^v//' | sort -V | tail -n 1)
-
+          latest=$(echo "$tags" | grep -E '^1\.[0-9]+$' | sort -V | tail -n 1)
           if [ -z "$latest" ]; then
             next="1.0"
           else
@@ -38,7 +35,6 @@ jobs:
             minor=$(echo "$latest" | cut -d. -f2)
             next="$major.$((minor + 1))"
           fi
-
           echo "Next version: $next"
           echo "version=$next" >> "$GITHUB_OUTPUT"
 

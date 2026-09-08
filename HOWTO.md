@@ -1,51 +1,81 @@
-# Once Human Dedicated Server — HOWTO
+# Once Human Game Server - Setup Guide
 
-## 1. Prerequisites
+Host and play on your own Once Human Private Hive server.
 
-- Docker Engine 24+
-- Docker Compose v2+
-- 4GB RAM minimum
-- Ports 27015, 27016, 27017 available
+## ⚠️ Official Model Note
 
-## 2. Initial Setup
+Once Human custom servers are **rental-based** through official channels. This container provides a self-hosted alternative using Wine to run the Windows server binary. Character progress from official servers does **not** transfer to self-hosted servers.
+
+Official rental: https://www.oncehuman.game/2026/csfy/
+
+## Quick Start
 
 ```bash
-# Clone this repo
 git clone https://github.com/wickedyoda/OnceHuman_GameServer.git
 cd OnceHuman_GameServer
 
-# Create env file
 cp .env.example .env
-nano .env
-```
-
-Edit `.env` and set:
-- `SERVER_NAME`
-- `MAX_PLAYERS`
-- `SERVER_PASSWORD`
-- `ADMIN_PASSWORD`
-
-## 3. Start the Server
-
-```bash
 docker compose up -d --build
 ```
 
-Watch logs:
+## Configuration
+
+### Environment Variables (`.env`)
+
+```env
+# Private Hive license (from https://www.oncehuman.game/2026/csfy/ if you have one):
+HIVE_LICENSE=
+
+# Server settings:
+SERVER_NAME=My Once Human Server
+MAX_PLAYERS=16
+SERVER_PASSWORD=
+ADMIN_PASSWORD=
+PVE_ENABLED=True
+DAY_LENGTH=60
+NIGHT_LENGTH=30
+```
+
+### GameUserSettings.ini
+
+Located at `config/GameUserSettings.ini`. Edits are picked up on container restart (file is mounted read-only into the container).
+
+## Ports
+
+| Port | Protocol | Purpose |
+|------|----------|---------|
+| 27015 | TCP/UDP | Game traffic |
+| 27016 | TCP/UDP | Query/heartbeat |
+| 27017 | TCP | RCON |
+
+Forward these in your router settings.
+
+## Volume Mappings
+
+| Host Path | Container Path | Purpose |
+|-----------|----------------|---------|
+| `./saves/` | `/home/wineuser/.wine/drive_c/oncehuman/Saved` | World saves, configs, logs |
+| `./config/GameUserSettings.ini` | Read-only config | Server settings |
+
+## Running
+
 ```bash
-docker compose logs -f oncehuman
+# Start
+docker compose up -d
+
+# View logs
+docker compose logs -f
+
+# Stop
+docker compose down
 ```
 
-Wait for:
-```
-Server is ready
-```
-
-## 4. Connect
+## Admin Access
 
 ### Find Your Server IP
 
 On the server host:
+
 ```bash
 curl ifconfig.me
 ```
@@ -62,7 +92,8 @@ Use that public IP for connections from outside your network.
 
 ### Direct Connect
 
-If your server doesn’t appear in the browser:
+If your server doesn't appear in the browser:
+
 - **PC:** press `` ` `` or `~` to open the console, then type:
   ```
   open <your-public-ip>:27015
@@ -74,101 +105,35 @@ If your server doesn’t appear in the browser:
 - Ports forwarded: TCP/UDP `27015`, `27016`, `27017`
 - Server running: `docker compose ps`
 - Using the **public IP**, not a LAN address like `192.168.x.x`
-- Same game version — update the server with `docker compose pull && docker compose up -d --build` if needed
+- Same game version
 
 ### Cross-Platform Notes
 
 Once Human supports crossplay between PC, PS5, Xbox, and mobile. All clients connect the same way via IP or server browser. Players just need their own Once Human account/license and the server password if set.
 
-## 5. Character Transfer
-
-### Important Limitation
-
-Official Once Human servers and custom/community servers are **separate**. According to official announcements and Steam discussions:
-
-- Characters from official servers **do not appear** in custom servers.
-- Custom servers **do not support data migration** between scenarios.
-- Each character is **bound to the specific server** where it was created.
-- When a server is reset, characters retain nickname/appearance, but **all other progress is erased**.
-
-### What This Means for Your Self-Hosted Server
-
-Players joining your self-hosted server will need to **create new characters** there. Their official-server progress cannot be imported or transferred.
-
-### If Transfer Becomes Available
-
-If future updates add export/import functionality:
-
-1. Export the character on the source server.
-2. Stop the server here: `docker compose stop oncehuman`
-3. Place exported data into the mounted `saved/` directory on the host.
-4. Start the server: `docker compose up -d`
-5. Confirm the character appears.
-
-### Backup First
-
-Always back up `saved/` before importing any data:
-```bash
-cp -r saved saved-backup-$(date +%Y%m%d)
-```
-
-## 6. Manage the Server
-
 ### RCON
-Use any RCON client with:
-- Host: `localhost:27017`
-- Password: value of `ADMIN_PASSWORD`
 
-### Useful Commands
-```
-listplayers
-kick <name>
-ban <name>
-saveworld
-```
-
-### Restart
 ```bash
-docker compose restart oncehuman
+# Example with rcon-cli (install via pip)
+rcon-cli -host localhost -port 27017 -password <ADMIN_PASSWORD>
 ```
-
-### Update Server Files
-```bash
-docker compose pull
-docker compose up -d --build
-```
-
-## 6. Backup
-
-Back up these directories regularly:
-- `saved/` — world save data
-- `config/` — server settings
-
-## 7. Port Forwarding
-
-Forward these ports on your router to this host:
-- TCP/UDP 27015
-- TCP/UDP 27016
-- TCP/UDP 27017
 
 ## Troubleshooting
 
-**Friends can't connect:**
-- Check port forwarding
-- Verify firewall allows ports
-- Confirm server is running: `docker compose ps`
-- Use public IP, not 192.168.x.x
+| Issue | Solution |
+|-------|----------|
+| Won't start | `docker compose logs oncehuman` — check Wine errors |
+| Port in use | `ss -tlnp \| grep 27015` — kill conflicting process |
+| Players can't connect | Verify port forwarding; check firewall |
+| Performance | Reduce `MAX_PLAYERS`; increase resources |
+| Wine crash | Check `saves/OnceHuman/Saved/Logs/` |
+| Save file corrupted | Stop container; restore from backup |
 
-**Server won't start:**
-- Check logs: `docker compose logs`
-- Verify ports aren't in use
-- Ensure enough RAM available
+## Character Transfer
 
-**Performance issues:**
-- Reduce `MAX_PLAYERS`
-- Lower resource multipliers
-- Check CPU/RAM limits in `docker-compose.yml`
+Official Once Human servers and custom/community servers are **separate** per official announcements. Characters created on official servers do **not appear** in custom servers and cannot be imported. Players joining your self-hosted server must create new characters.
 
-## License
+## References
 
-This project is licensed under the GNU General Public License v3.0. See the repository [LICENSE](./LICENSE) file for details.
+- Official Custom Server Guide: https://www.oncehuman.game/2026/csfy/
+- Server Setup Wiki: https://www.oncehuman.wiki/guides/dedicated-server.html
