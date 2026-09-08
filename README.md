@@ -15,7 +15,7 @@ Once Human server binaries run on Windows. This image uses Wine via SteamCMD to 
 - Docker v24+ and Docker Compose v2+
 - Linux host with 8GB+ RAM (16GB recommended for 16+ players)
 - 30GB+ free disk space
-- Wine support (included in scottyhardy/docker-wine:latest)
+- Wine support (included in the image via Debian 12 + Wine packages)
 
 ## Quick Start
 
