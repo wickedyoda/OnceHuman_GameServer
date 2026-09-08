@@ -1,1 +1,9 @@
-.
+# Don't commit compiled images
+*.sarif
+*_report.json
+
+# Don't commit local configs
+.env
+
+# Local build artifacts
+*.log
