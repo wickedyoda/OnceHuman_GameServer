@@ -1,4 +1,4 @@
-FROM debian:12.15-slim
+FROM debian:12-slim
 
 LABEL maintainer="WickedYoda" \
       description="Once Human Dedicated Server (Wine-based, self-hosted)" \
@@ -9,9 +9,10 @@ ENV DEBIAN_FRONTEND=noninteractive \
     SERVER_NAME="My Once Human Server" \
     MAX_PLAYERS=16
 
-# Enable multiarch and install Wine + dependencies
+# Enable multiarch, upgrade base packages, then install Wine + dependencies
 RUN dpkg --add-architecture i386 && \
     apt-get update && \
+    apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
         wine \
         wine32 \
