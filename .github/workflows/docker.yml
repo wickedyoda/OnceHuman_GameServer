@@ -13,6 +13,8 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -23,11 +25,7 @@ jobs:
       - name: Determine next version
         id: version
         run: |
-          OWNER="${{ github.repository_owner }}"
-          REPO="${{ github.event.repository.name }}"
-          tags=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/$OWNER/$REPO/git/refs/tags" | grep -o '"ref": "refs/tags/[^"]*"' | sed 's/.*refs\/tags\///')
-          latest=$(echo "$tags" | grep -E '^1\.[0-9]+$' | sort -V | tail -n 1)
+          latest=$(git tag -l '1.*' | sort -V | tail -n 1 || true)
           if [ -z "$latest" ]; then
             next="1.0"
           else
