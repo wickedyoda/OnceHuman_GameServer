@@ -1,9 +1,19 @@
-# Don't commit compiled images
-*.sarif
-*_report.json
+# Security reports
+security-reports/
 
-# Don't commit local configs
-.env
+# Docker
+*.pid
 
-# Local build artifacts
+# Build artifacts
+server/
 *.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
