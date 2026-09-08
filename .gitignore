@@ -1,3 +1,9 @@
+# Don't commit compiled images
+*.sarif
+*_report.json
+
+# Don't commit local configs
 .env
-saved/*
-!saved/.gitkeep
+
+# Local build artifacts
+*.log
