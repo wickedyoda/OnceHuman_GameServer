@@ -1,0 +1,19 @@
+{
+  "SchemaVersion": 2,
+  "Trivy": {
+    "Version": "0.74.0"
+  },
+  "ReportID": "01a0810e-636f-7e5c-8039-3f8d6121764e",
+  "CreatedAt": "2026-09-08T07:46:38.959943099-05:00",
+  "ArtifactID": "sha256:94f1f6e12356cf4d3d1e8830b14d51803007d7358e8e7700af6ea045d38c4c9f",
+  "ArtifactName": ".",
+  "ArtifactType": "repository",
+  "Metadata": {
+    "RepoURL": "https://github.com/wickedyoda/OnceHuman_GameServer.git",
+    "Branch": "main",
+    "Commit": "9e3f901732da90629b5d25610314939c9900ca58",
+    "CommitMsg": "chore: merge rewrite-history (purge old reports from history, fix workflow token)",
+    "Author": "Jarvis \u003cjarvis@wickedyoda.local\u003e",
+    "Committer": "Jarvis \u003cjarvis@wickedyoda.local\u003e"
+  }
+}

@@ -1,0 +1,9 @@
+title = "Once Human Gitleaks Config"
+
+[allowlist]
+  description = "Ignore false positives from security scan reports"
+  paths = [
+    '''trivy-.*''',
+    '''gitleaks-.*''',
+    '''reports/.*''',
+  ]
