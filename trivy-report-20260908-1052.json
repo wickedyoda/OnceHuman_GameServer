@@ -1,0 +1,19 @@
+{
+  "SchemaVersion": 2,
+  "Trivy": {
+    "Version": "0.74.0"
+  },
+  "ReportID": "01a081b8-b4d7-7e94-9ade-3769250b669d",
+  "CreatedAt": "2026-09-08T10:52:40.919959463-05:00",
+  "ArtifactID": "sha256:e2ffffbf57a6a8f4c30ab5b59e68e0949c98ee60cdd26d70169bdada7aa721bd",
+  "ArtifactName": ".",
+  "ArtifactType": "repository",
+  "Metadata": {
+    "RepoURL": "https://github.com/wickedyoda/OnceHuman_GameServer.git",
+    "Branch": "add-scripts",
+    "Commit": "dddb497ae912e4f43c1ea0b02d9b829c7ab30243",
+    "CommitMsg": "docs: add utility scripts for report rotation and pushing",
+    "Author": "Jarvis \u003cjarvis@wickedyoda.local\u003e",
+    "Committer": "Jarvis \u003cjarvis@wickedyoda.local\u003e"
+  }
+}

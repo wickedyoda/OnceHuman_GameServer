@@ -2,7 +2,9 @@ version: '3.8'
 
 services:
   oncehuman:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: ghcr.io/wickedyoda/oncehuman_gameserver:latest
     container_name: oncehuman
     restart: unless-stopped
@@ -13,8 +15,8 @@ services:
       - "27016:27016/udp"
       - "27017:27017/tcp"
     volumes:
-      - ./saves:/home/wineuser/.wine/drive_c/oncehuman/Saved
-      - ./config/GameUserSettings.ini:/home/wineuser/.wine/drive_c/oncehuman/OnceHuman/Saved/Config/WindowsServer/GameUserSettings.ini:ro
+      - ./saves:/home/oncehuman/server/OnceHuman/Saved
+      - ./config/GameUserSettings.ini:/home/oncehuman/server/OnceHuman/Saved/Config/WindowsServer/GameUserSettings.ini:ro
     environment:
       - SERVER_NAME=${SERVER_NAME:-My Once Human Server}
       - MAX_PLAYERS=${MAX_PLAYERS:-16}
@@ -26,7 +28,6 @@ services:
       - XP_MULTIPLIER=${XP_MULTIPLIER:-1.0}
       - RESOURCE_MULTIPLIER=${RESOURCE_MULTIPLIER:-1.0}
       - DROP_MULTIPLIER=${DROP_MULTIPLIER:-1.0}
-      - HIVE_LICENSE=${HIVE_LICENSE:-}
     deploy:
       resources:
         limits:
@@ -35,3 +36,10 @@ services:
         reservations:
           cpus: '1.0'
           memory: 2G
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
+      - /home/oncehuman/.wine

@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
     steps:
       - uses: actions/checkout@v4
@@ -25,13 +25,12 @@ jobs:
       - name: Determine next version
         id: version
         run: |
-          latest=$(git tag -l '1.*' | sort -V | tail -n 1 || true)
-          if [ -z "$latest" ]; then
-            next="1.0"
+          latest_tag=$(git tag -l '1.*' | sort -V | tail -n 1 || true)
+          if [ -z "$latest_tag" ]; then
+            next="1.01"
           else
-            major=$(echo "$latest" | cut -d. -f1)
-            minor=$(echo "$latest" | cut -d. -f2)
-            next="$major.$((minor + 1))"
+            minor=$(echo "$latest_tag" | cut -d. -f2)
+            next=$(printf "1.%02d" $((10#$minor + 1)))
           fi
           echo "Next version: $next"
           echo "version=$next" >> "$GITHUB_OUTPUT"
@@ -57,7 +56,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.version.outputs.version }}
-          name: ${{ steps.version.outputs.version }}
+          name: OnceHuman_GameServer - ${{ github.run_id }}@${{ steps.version.outputs.version }} - version ${{ steps.version.outputs.version }}
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
